@@ -1,0 +1,30 @@
+# Core Orchestration & Graph Engine
+langgraph>=0.2.20
+langchain-core>=0.3.0
+langchain-community>=0.3.0
+
+# LLM Providers (Multi-Provider Support)
+langchain-openai>=0.2.0
+langchain-google-genai>=2.0.0
+langchain-groq>=0.2.0
+
+# Configuration & Data Validation
+pydantic>=2.7.0
+pydantic-settings>=2.2.0
+python-dotenv>=1.0.0
+
+# Tools & Web Ingestion
+duckduckgo-search>=6.2.0
+httpx>=0.27.0
+beautifulsoup4>=4.12.0
+tavily-python>=0.4.0
+
+# MCP (Model Context Protocol) Support
+mcp>=1.1.0
+
+# CLI & Visualization
+rich>=13.7.0
+
+# API Layer
+fastapi>=0.111.0
+uvicorn>=0.30.0
