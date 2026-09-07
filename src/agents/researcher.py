@@ -41,7 +41,31 @@ class ResearchWorkerAgent:
                 relevance_score=float(item.get("score", 0.8)),
             )
             sources.append(src)
-            snippets_text.append(f"[{src.id}] {src.title}: {src.snippet}")
+            # Index retrieved evidence into MCP vector store (ChromaDB / in-memory)
+            try:
+                self.mcp.execute_tool(
+                    "index_document",
+                    {"text": src.snippet, "title": src.title, "url": src.url, "doc_id": src.id},
+                )
+            except Exception as idx_err:
+                logger.debug(f"MCP vector indexing notice: {idx_err}")
+
+        # Semantic re-ranking via vector similarity search
+        try:
+            vector_hits = self.mcp.execute_tool(
+                "vector_search",
+                {"query": sub_q.question, "top_k": 3},
+            )
+            if vector_hits and isinstance(vector_hits, list):
+                snippets_text = [
+                    f"[{hit.get('id', 'src')}] {hit.get('title', 'Source')}: {hit.get('text', '')} (Similarity: {hit.get('score', 1.0)})"
+                    for hit in vector_hits
+                ]
+        except Exception as v_err:
+            logger.debug(f"Vector search notice: {v_err}")
+
+        if not snippets_text:
+            snippets_text = [f"[{src.id}] {src.title}: {src.snippet}" for src in sources]
 
         context_block = "\n".join(snippets_text) if snippets_text else "No external search snippets returned."
 

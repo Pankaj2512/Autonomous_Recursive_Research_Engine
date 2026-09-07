@@ -8,6 +8,7 @@ from typing import Any, Callable, Dict, List, Optional
 
 from src.tools.scraper import scrape_url_content
 from src.tools.search import perform_web_search
+from src.tools.vector_store import index_document, search_vector_store
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +70,66 @@ class ResearchMCPServer:
             handler=lambda args: scrape_url_content(
                 url=args.get("url", ""),
                 max_length=int(args.get("max_length", 2500)),
+            ),
+        )
+
+        self.register_tool(
+            name="vector_search",
+            description="Searches indexed research documents and snippets semantically using vector similarity (ChromaDB).",
+            input_schema={
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "Semantic search query to retrieve relevant contextual passages.",
+                    },
+                    "top_k": {
+                        "type": "integer",
+                        "description": "Number of top matching passages to return (default 4).",
+                        "default": 4,
+                    },
+                },
+                "required": ["query"],
+            },
+            handler=lambda args: search_vector_store(
+                query=args.get("query", ""),
+                top_k=int(args.get("top_k", 4)),
+            ),
+        )
+
+        self.register_tool(
+            name="index_document",
+            description="Indexes a document or text snippet into the vector store for semantic retrieval.",
+            input_schema={
+                "type": "object",
+                "properties": {
+                    "text": {
+                        "type": "string",
+                        "description": "Text body or passage to index.",
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "Title or label for the source document.",
+                        "default": "",
+                    },
+                    "url": {
+                        "type": "string",
+                        "description": "Source URL or identifier.",
+                        "default": "",
+                    },
+                    "doc_id": {
+                        "type": "string",
+                        "description": "Unique identifier for the document chunk.",
+                        "default": "",
+                    },
+                },
+                "required": ["text"],
+            },
+            handler=lambda args: index_document(
+                text=args.get("text", ""),
+                title=args.get("title", ""),
+                url=args.get("url", ""),
+                doc_id=args.get("doc_id", ""),
             ),
         )
 
