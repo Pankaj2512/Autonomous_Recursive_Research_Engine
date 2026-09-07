@@ -30,15 +30,7 @@ class MockChatModel:
             prompt_text = messages
 
         # Heuristic simulation based on agent prompts
-        if "Decompose the topic" in prompt_text or "Prime Agent" in prompt_text:
-            content = (
-                '[\n'
-                '  {"question": "What are the core technical mechanisms and architectural bottlenecks?", "rationale": "Understand technical principles and constraints."},\n'
-                '  {"question": "What empirical benchmarks and performance metrics exist?", "rationale": "Quantify real-world effectiveness."},\n'
-                '  {"question": "What are the leading industrial trade-offs and future developments?", "rationale": "Provide forward-looking strategic context."}\n'
-                ']'
-            )
-        elif "Verification" in prompt_text or "fact-check" in prompt_text or "critique" in prompt_text:
+        if "Audit and Verification" in prompt_text or "fact-check" in prompt_text or "critique" in prompt_text:
             content = (
                 '{\n'
                 '  "sufficient": true,\n'
@@ -48,6 +40,14 @@ class MockChatModel:
                 '  "unresolved_gaps": [],\n'
                 '  "suggested_followups": []\n'
                 '}'
+            )
+        elif "Decompose the topic" in prompt_text or "Prime Agent" in prompt_text or "Prime Supervisor" in prompt_text:
+            content = (
+                '[\n'
+                '  {"question": "What are the core technical mechanisms and architectural bottlenecks?", "rationale": "Understand technical principles and constraints."},\n'
+                '  {"question": "What empirical benchmarks and performance metrics exist?", "rationale": "Quantify real-world effectiveness."},\n'
+                '  {"question": "What are the leading industrial trade-offs and future developments?", "rationale": "Provide forward-looking strategic context."}\n'
+                ']'
             )
         elif "Synthesizer" in prompt_text or "Final Report" in prompt_text:
             content = (

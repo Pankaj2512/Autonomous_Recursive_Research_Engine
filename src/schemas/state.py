@@ -4,7 +4,11 @@ from __future__ import annotations
 import time
 import uuid
 from typing import Any, Dict, List, Optional
-from typing_extensions import TypedDict
+
+try:
+    from typing import TypedDict
+except ImportError:
+    from typing_extensions import TypedDict  # type: ignore[assignment]
 
 try:
     from pydantic import BaseModel, Field
