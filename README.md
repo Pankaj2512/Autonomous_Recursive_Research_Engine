@@ -145,6 +145,17 @@ python3 main.py --topic "Model Context Protocol in Agentic AI" --max-depth 2
 
 The output report will automatically be saved to `outputs/report_<topic>_<timestamp>.md`.
 
+### Interactive Web Dashboard (Streamlit)
+Launch the full visual research studio with real-time tree graphs, live telemetry, and metric gauges:
+```bash
+# Launch via main wrapper
+python3 main.py --ui
+
+# Or run directly via streamlit
+streamlit run src/ui/dashboard.py
+```
+* **Features:** Live inquiry graph, grounding confidence & hallucination rate gauges, token savings monitor, and instant Markdown / JSON export.
+
 ### REST API Server
 Launch the FastAPI backend for web and mobile integration:
 ```bash
