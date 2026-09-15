@@ -129,6 +129,16 @@ OPENAI_API_KEY=sk-...
 SEARCH_PROVIDER=duckduckgo
 ```
 
+### 3. Containerized Deployment (Docker)
+Build and run the engine inside an isolated container:
+```bash
+# Build Docker image
+docker build -t recursive-research-engine .
+
+# Run research CLI inside container
+docker run --env-file .env -v $(pwd)/outputs:/app/outputs recursive-research-engine --topic "Agentic AI Architectures" --max-depth 2
+```
+
 ---
 
 ## 💻 Usage
