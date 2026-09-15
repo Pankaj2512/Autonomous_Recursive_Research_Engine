@@ -81,3 +81,20 @@ def get_settings() -> Settings:
         _settings = Settings()
         _settings.output_dir.mkdir(parents=True, exist_ok=True)
     return _settings
+
+
+MODEL_PRICING_PER_1M: dict[str, dict[str, float]] = {
+    "gpt-4o-mini": {"prompt": 0.15, "completion": 0.60},
+    "gpt-4o": {"prompt": 2.50, "completion": 10.00},
+    "gemini-1.5-flash": {"prompt": 0.075, "completion": 0.30},
+    "gemini-1.5-pro": {"prompt": 1.25, "completion": 5.00},
+    "llama3-70b-8192": {"prompt": 0.59, "completion": 0.79},
+    "default": {"prompt": 0.20, "completion": 0.80},
+}
+
+
+def estimate_token_cost(prompt_tokens: int, completion_tokens: int, model_name: str = "gpt-4o-mini") -> float:
+    """Calculate approximate USD cost for token usage based on per-million token rates."""
+    pricing = MODEL_PRICING_PER_1M.get(model_name.lower(), MODEL_PRICING_PER_1M["default"])
+    cost = (prompt_tokens / 1_000_000 * pricing["prompt"]) + (completion_tokens / 1_000_000 * pricing["completion"])
+    return round(cost, 6)
