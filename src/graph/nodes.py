@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 def planner_node(state: ResearchState) -> Dict[str, Any]:
     """Prime Supervisor planning node: decomposes goal or refines queries recursively."""
+    start_time = time.time()
     topic = state.get("topic", "")
     depth = state.get("recursion_depth", 0)
     history = state.get("verification_history", [])
@@ -45,11 +46,13 @@ def planner_node(state: ResearchState) -> Dict[str, Any]:
     for sq in new_sub_questions:
         existing_sq.append(sq.model_dump() if hasattr(sq, "model_dump") else sq.__dict__)
 
+    duration = round(time.time() - start_time, 3)
     log_entry = {
         "timestamp": time.time(),
         "node": "planner",
         "depth": depth,
-        "message": f"Generated {len(new_sub_questions)} sub-questions (Recursion depth: {depth}).",
+        "duration_seconds": duration,
+        "message": f"Generated {len(new_sub_questions)} sub-questions in {duration}s (Recursion depth: {depth}).",
     }
     logs.append(log_entry)
 
@@ -61,6 +64,7 @@ def planner_node(state: ResearchState) -> Dict[str, Any]:
 
 def researcher_node(state: ResearchState) -> Dict[str, Any]:
     """Worker node: investigates pending sub-questions via Model Context Protocol (MCP)."""
+    start_time = time.time()
     sub_questions_raw = state.get("sub_questions", [])
     existing_sources_raw = list(state.get("sources", []))
     logs = list(state.get("trace_logs", []))
@@ -90,10 +94,12 @@ def researcher_node(state: ResearchState) -> Dict[str, Any]:
     # Dynamic Context Pruning
     pruned_sources, metrics = prune_and_deduplicate_sources(existing_sources_raw)
 
+    duration = round(time.time() - start_time, 3)
     log_entry = {
         "timestamp": time.time(),
         "node": "researcher",
-        "message": f"Investigated questions via MCP. Pruned {metrics['raw_count']} sources -> {metrics['pruned_count']}. "
+        "duration_seconds": duration,
+        "message": f"Investigated questions via MCP in {duration}s. Pruned {metrics['raw_count']} sources -> {metrics['pruned_count']}. "
                    f"Estimated token savings: {metrics['savings_percentage']}%.",
     }
     logs.append(log_entry)
@@ -108,6 +114,7 @@ def researcher_node(state: ResearchState) -> Dict[str, Any]:
 
 def verifier_node(state: ResearchState) -> Dict[str, Any]:
     """Verification and reflection node: evaluates factual grounding and detects gaps."""
+    start_time = time.time()
     topic = state.get("topic", "")
     depth = state.get("recursion_depth", 0)
     sub_questions = [SubQuestion(**q) for q in state.get("sub_questions", [])]
@@ -128,14 +135,16 @@ def verifier_node(state: ResearchState) -> Dict[str, Any]:
 
     new_depth = depth + 1
 
+    duration = round(time.time() - start_time, 3)
     log_entry = {
         "timestamp": time.time(),
         "node": "verifier",
         "depth": depth,
+        "duration_seconds": duration,
         "confidence": assessment.confidence_score,
         "hallucination_score": assessment.hallucination_score,
         "sufficient": assessment.sufficient,
-        "message": f"Verification completed. Sufficient: {assessment.sufficient}, "
+        "message": f"Verification completed in {duration}s. Sufficient: {assessment.sufficient}, "
                    f"Confidence: {assessment.confidence_score * 100:.1f}%, Hallucination: {assessment.hallucination_score:.2f}.",
     }
     logs.append(log_entry)
@@ -149,6 +158,7 @@ def verifier_node(state: ResearchState) -> Dict[str, Any]:
 
 def synthesizer_node(state: ResearchState) -> Dict[str, Any]:
     """Synthesis node: generates final cited markdown intelligence report."""
+    start_time = time.time()
     topic = state.get("topic", "")
     depth = state.get("recursion_depth", 0)
     sub_questions = [SubQuestion(**q) for q in state.get("sub_questions", [])]
@@ -169,10 +179,12 @@ def synthesizer_node(state: ResearchState) -> Dict[str, Any]:
         recursion_depth=depth,
     )
 
+    duration = round(time.time() - start_time, 3)
     log_entry = {
         "timestamp": time.time(),
         "node": "synthesizer",
-        "message": "Final cited research intelligence report compiled.",
+        "duration_seconds": duration,
+        "message": f"Final cited research intelligence report compiled in {duration}s.",
     }
     logs.append(log_entry)
 
